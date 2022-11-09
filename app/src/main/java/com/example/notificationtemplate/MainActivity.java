@@ -1,11 +1,18 @@
 package com.example.notificationtemplate;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,13 +21,17 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String PERIODS_NOTIFICATION_ID = "10002";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        createChannels();
 
-        setNotificationAlert();
+
+        setNotificationAlert1();
         sendNotificationAleret2();
 
     }
@@ -29,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Hello!!", Toast.LENGTH_SHORT).show();
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 6);
-        calendar.set(Calendar.MINUTE,20);
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        calendar.set(Calendar.MINUTE,45);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND,0);
 
@@ -58,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setNotificationAlert() {
+    private void setNotificationAlert1() {
         Toast.makeText(this, "Hello!!", Toast.LENGTH_SHORT).show();
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 6);
-        calendar.set(Calendar.MINUTE,19);
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        calendar.set(Calendar.MINUTE,44);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND,0);
 
@@ -89,5 +100,34 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+
+
+    private void createChannels(){
+
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+
+            AudioAttributes attributes = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
+            //String description = mContext.getString(R.string.default_notification_channel_description);
+
+            NotificationManager mNotificationManager = getSystemService(NotificationManager.class);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel(PERIODS_NOTIFICATION_ID, "Period Notify Channel", importance);
+            notificationChannel.enableLights(true);
+            notificationChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI,attributes);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            //NotificationChannel.setDescription("Period Notification");
+            notificationChannel.setBypassDnd(true);
+            notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            notificationChannel.setShowBadge(true);
+
+
+            assert mNotificationManager != null;
+            mNotificationManager.createNotificationChannel(notificationChannel);
+
+        }
     }
 }
