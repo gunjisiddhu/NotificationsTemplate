@@ -21,6 +21,7 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String APP_TAG = "VUCSE:WakeLock";
     private static final String PERIODS_NOTIFICATION_ID = "10002";
 
     @Override
@@ -41,12 +42,15 @@ public class MainActivity extends AppCompatActivity {
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 5);
-        calendar.set(Calendar.MINUTE,45);
+        calendar.set(Calendar.MINUTE,30 );
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND,0);
 
         if (calendar.getTime().compareTo(new Date()) < 0)
             calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        //https://stackoverflow.com/questions/11882102/adding-a-day-to-a-calendar-in-android-fails-on-31st
+
 
         Log.e("caldemd",calendar.getTime()+"");
         Intent intent = new Intent(getApplicationContext(), NotifyService.class);
@@ -74,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 5);
-        calendar.set(Calendar.MINUTE,44);
+        calendar.set(Calendar.MINUTE,29);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND,0);
 
@@ -93,7 +97,9 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         if (alarmManager != null) {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),  pendingIntent);
+            }
         }else{
             Toast.makeText(this, "ok avvaledu", Toast.LENGTH_SHORT).show();
         }

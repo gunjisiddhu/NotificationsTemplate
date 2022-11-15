@@ -36,6 +36,7 @@ public class NotificationChannels extends Application {
                 NotificationChannel notificationChannel = new NotificationChannel(PERIODS_NOTIFICATION_ID, "Period Notify Channel", importance);
                 notificationChannel.enableLights(true);
                 notificationChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI,attributes);
+                notificationChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
                 notificationChannel.setLightColor(Color.RED);
                 notificationChannel.enableVibration(true);
                 notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
