@@ -32,13 +32,6 @@ public class NotifyService extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent mIntent) {
 
-        /*PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
-                        | PowerManager.ON_AFTER_RELEASE,
-                "app:wakeup");
-        wl.acquire();*/
-
-
         Log.e("Bro NOTIFICATION APP",new Date().toString());
 
         Bundle bundle = mIntent.getBundleExtra("bundle");
@@ -88,13 +81,6 @@ public class NotifyService extends BroadcastReceiver {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0 , intent,0);
 
-        PowerManager powerManager = (PowerManager) context.getSystemService(context.POWER_SERVICE);
-        PowerManager.WakeLock  wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                PowerManager.ON_AFTER_RELEASE, "appname::WakeLock");
-
-//acquire will turn on the display
-        wakeLock.acquire(1*60*1000L);
 
 
         //int period = mIntent.getIntExtra("period",0);
@@ -110,23 +96,12 @@ public class NotifyService extends BroadcastReceiver {
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-
-
-
-        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(PERIODS_NOTIFICATION_ID, "NOTIFICATION_CHANNEL_NAME", importance);
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-            assert mNotificationManager != null;
-            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
-            mNotificationManager.createNotificationChannel(notificationChannel);
-        }*/
         assert mNotificationManager != null;
         mNotificationManager.notify(0 /* Request Code */, mBuilder.build());
+
+
+        setNextNotification(context);
+
 
 
         /*NotificationManagerCompat notificationCompat = NotificationManagerCompat.from(context);
@@ -135,6 +110,34 @@ public class NotifyService extends BroadcastReceiver {
 
 
 
+
+    }
+
+
+    private void setNextNotification(Context context){
+
+        Calendar cal = Calendar.getInstance();
+        Log.e("calender Printed this",cal.toString());
+        cal.add(Calendar.MINUTE, 1);
+        Log.e("calender Printed this",cal.toString());
+
+
+        Intent srvIntent = new Intent(context, NotifyService.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("period",1);
+        bundle.putString("type_of_notif","period");
+        //intent.putExtra("period",1);
+        //intent.putExtra("type","period");
+        srvIntent.putExtra("bundle",bundle);
+        PendingIntent pIntent = PendingIntent.getBroadcast(context, 196, srvIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Use context argument to access service
+        AlarmManager alarm =
+                (AlarmManager)context.getSystemService(ALARM_SERVICE);
+
+        // Repeat every 5 seconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),  pIntent);
+        }
 
     }
 
